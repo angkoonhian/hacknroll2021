@@ -8,17 +8,12 @@ api = Api(app)
 
 
 class test(Resource):
-    def get(self, message):
-        tokenizer, model = word_generator.load_model_tokenizer_GPT2()
-        prob_word_dic = word_generator.next_word_prediction(tokenizer, model, message, num_results = 3)
-        return prob_word_dic
-
-    def post(self, message):
+    def post(self):
         if request.files:
-            result = pdf_png_text_extraction.process_pdf(request.files['filename'])
+            result = pdf_png_text_extraction.process_file_post(request.files['filename'])
         return result
 
-api.add_resource(test, '/nwp/<string:message>')
+api.add_resource(test, '/')
 
 if __name__ == "__main__":
     app.run(debug = True)

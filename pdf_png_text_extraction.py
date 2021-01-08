@@ -4,6 +4,7 @@ import numpy as np
 #import docx
 import PyPDF2
 import word_summarizer
+import os
 
 # get grayscale image
 def get_grayscale(image):
@@ -115,9 +116,6 @@ def process_file(filename):
         text = read_pdf(filename)
     else:
         text = read_image(filename)
-
-
-
     tokenizer, model = word_summarizer.load_model_tokenizer_BERT()
     sentence_list = word_summarizer.split_into_sentences(text)
     summary_length = len(sentence_list)//4
@@ -127,3 +125,36 @@ def process_file(filename):
     summarized_text = word_summarizer.sentence_summarizer(sentence_list, tokenizer, model, int(summary_length))
     return summarized_text
 
+def process_file_post(filestorage):
+    curr_dir = os.path.dirname(os.path.realpath(__file__))
+    filetype = ""
+    filename = filestorage.filename
+    for i in range(-1, -len(filename), -1):
+        if filename[i] == ".":
+            break
+        else:
+            filetype = filename[i] + filetype
+    if filetype == "txt":
+        filestorage.save(f"{curr_dir}\\data\\tmp.txt")
+        file_dir = f"{curr_dir}\\data\\tmp.txt"
+        text = read_txt(file_dir)
+    elif filetype == "docx":
+        filestorage.save(f"{curr_dir}\\data\\tmp.docx")
+        file_dir = f"{curr_dir}\\data\\tmp.docx"
+        text = read_worddoc(file_dir)
+    elif filetype == "pdf":
+        filestorage.save(f"{curr_dir}\\data\\tmp.pdf")
+        file_dir = f"{curr_dir}\\data\\tmp.pdf"
+        text = read_pdf(file_dir)
+    else:
+        filestorage.save(f"{curr_dir}\\data\\tmp.png")
+        file_dir = f"{curr_dir}\\data\\tmp.png"
+        text = read_image(file_dir)
+    
+    tokenizer, model = word_summarizer.load_model_tokenizer_BERT()
+    sentence_list = word_summarizer.split_into_sentences(text)
+    summary_length = len(sentence_list)//4
+    if summary_length == 0:
+        return ""
+    summarized_text = word_summarizer.sentence_summarizer(sentence_list, tokenizer, model, int(summary_length))
+    return summarized_text
