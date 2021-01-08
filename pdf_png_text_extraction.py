@@ -1,31 +1,9 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[12]:
-
-
-get_ipython().system('pip install opencv-python')
-get_ipython().system('pip install pytesseract')
-get_ipython().system('pip install PyPDF2')
-
-
-# In[86]:
-
-
-get_ipython().system('pip install python-docx ')
-
-
-# In[87]:
-
-
 import cv2 
 import pytesseract
 import numpy as np
-import docx
-
-
-# In[73]:
-
+#import docx
+import PyPDF2
+import word_summarizer
 
 # get grayscale image
 def get_grayscale(image):
@@ -77,9 +55,6 @@ def match_template(image, template):
     return cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED) 
 
 
-# In[74]:
-
-
 #png,jpg
 def read_image(file_name):
     img = cv2.imread(file_name)
@@ -91,18 +66,6 @@ def read_image(file_name):
     
     return text 
 
-
-# In[76]:
-
-
-read_image(r'C:\Users\alici\Downloads\Hackathons\Hack&Roll2021\test_image.jpg')
-
-
-# In[103]:
-
-
-import PyPDF2
-
 def read_pdf(file_name):
     pdfFileObj = open(file_name, 'rb')
 
@@ -111,27 +74,15 @@ def read_pdf(file_name):
 
     # Get number of pages
     number_of_pages = pdfReader.getNumPages()
-    
     text= ""
     for page_number in range(number_of_pages):
       
         page = pdfReader.getPage(page_number)
         page_content = page.extractText()
         text += " ".join(page_content.split()) + "\n"
-
     return text
 
 
-# In[104]:
-
-
-print(read_pdf(r'C:\Users\alici\Downloads\Hackathons\Hack&Roll2021\test_text3.pdf'))
-
-
-# In[105]:
-
-
-import docx
 def read_worddoc(file_name):
     doc = docx.Document(file_name)
     fullText = []
@@ -140,33 +91,41 @@ def read_worddoc(file_name):
     return '\n'.join(fullText)
 
 
-# In[117]:
-
-
-print(read_worddoc(r'C:\Users\alici\Downloads\Hackathons\Hack&Roll2021\test_text.docx'))
-
-
-# In[119]:
-
-
 def read_txt(file_name):
-    
     txtFileObj = open(file_name, "r")
-    
     text = ""
     for line in txtFileObj:
         text += " ".join(line.split()) + "\n"             
     return text
 
 
-# In[120]:
+def process_file(filename):
+    filetype = ""
+    for i in range(-1, -len(filename), -1):
+        if filename[i] == ".":
+            break
+        else:
+            filetype = filename[i] + filetype
 
+    print(filetype)
+    return
+    if filetype == "txt":
+        text = read_txt(filename)
+    elif filetype == "docx":
+        text = read_worddoc(filename)
+    elif filetype == "pdf":
+        text = read_pdf(filename)
+    else:
+        text = read_image(filename)
 
-print(read_txt(r'C:\Users\alici\Downloads\Hackathons\Hack&Roll2021\test_text.txt'))
+    
 
-
-# In[ ]:
-
-
-
+    tokenizer, model = word_summarizer.load_model_tokenizer_BERT()
+    sentence_list = word_summarizer.split_into_sentences(text)
+    summary_length = len(sentence_list)//4
+    print(sentence_list)
+    if summary_length == 0:
+        return ""
+    summarized_text = word_summarizer.sentence_summarizer(sentence_list, tokenizer, model, int(summary_length))
+    return summarized_text
 

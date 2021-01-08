@@ -5,6 +5,7 @@ import numpy as np
 import random
 import os
 import nltk
+import spacy
 
 def load_model_tokenizer_BERT():
     """
@@ -131,7 +132,6 @@ def split_into_sentences(text):
     output = nltk.tokenize.sent_tokenize(text)
     return output
 
-
 def sentence_summarizer(sentence_list, tokenizer, model, summary_length):
     token_lst = []
     for i in range(len(sentence_list)):
@@ -139,7 +139,7 @@ def sentence_summarizer(sentence_list, tokenizer, model, summary_length):
         token_lst.append(output)
     sentence_embeddings = []
     sentence_dict = {}
-    for i in range(len(token_lst)):
+    for i in range(len(token_lst)): 
         averaged_outputs = average_hidden_states(token_lst[i], model)
         sentence_embeddings.append(averaged_outputs)
         sentence_dict[i] = averaged_outputs
@@ -160,3 +160,15 @@ def sentence_summarizer(sentence_list, tokenizer, model, summary_length):
         summary += sentence_list[i]
         summary += " "
     return summary
+
+def NER_summary(summary):
+    nlp = spacy.load('en_core_web_sm')
+    filter = {'ents':['GPE', 'ORG', 'PERSON']}
+    NER = nlp(summary)
+    summary_lst = summary.split(" ")
+    for i in range(len(summary_lst)):
+        if summary_lst[i] in NER.ents:
+            summary_lst[i] = "<strong>" + summary_lst[i] + "</strong>"
+    return " ".join(summary_lst)
+
+
