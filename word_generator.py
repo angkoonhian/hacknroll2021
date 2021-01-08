@@ -39,5 +39,3 @@ def next_word_prediction(tokenizer, model, text, num_results = 3):
         word = tokenizer.decode(int(index_most_likely_words[i]))
         prob_word_dic["word" + str(i)] = word
     return prob_word_dic
-
-load_model_tokenizer_GPT2()

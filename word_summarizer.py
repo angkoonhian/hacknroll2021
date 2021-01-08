@@ -4,6 +4,7 @@ import tensorflow as tf
 import numpy as np
 import random
 import os
+import nltk
 
 def load_model_tokenizer_BERT():
     """
@@ -11,7 +12,7 @@ def load_model_tokenizer_BERT():
     """
     dir_path = os.path.dirname(os.path.realpath(__file__))
     tokenizer = BertTokenizer.from_pretrained(f'{dir_path}\\bert_model')
-    model = TFBertModel.from_pretrained(f'{dir_path}\\bert_model')    
+    model = TFBertModel.from_pretrained(f'{dir_path}\\bert_model', output_hidden_states = True)    
     return tokenizer, model
 
 def average_hidden_states(sentence_token, model):
@@ -126,6 +127,10 @@ def get_best_sentences(centroid_list, embeddings):
         best_sentences.append(best_curr_sentence)
     return best_sentences
 
+def split_into_sentences(text):
+    output = nltk.tokenize.sent_tokenize(text)
+    return output
+
 
 def sentence_summarizer(sentence_list, tokenizer, model, summary_length):
     token_lst = []
@@ -155,8 +160,3 @@ def sentence_summarizer(sentence_list, tokenizer, model, summary_length):
         summary += sentence_list[i]
         summary += " "
     return summary
-
-
-
-
-load_model_tokenizer_BERT()

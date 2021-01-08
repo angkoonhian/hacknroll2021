@@ -52,7 +52,7 @@ def preview():
 	if request.method == 'POST':
 		newtext = request.form['newtext']
 		result = newtext
-	return render_template('preview.html',newtext=newtext,result=result)
+	return render_template('preview.html',newtext=newtext,result=result)  
 
 
 if __name__ == '__main__':

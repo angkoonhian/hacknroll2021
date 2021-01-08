@@ -1,23 +1,9 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[12]:
-
-
-get_ipython().system('pip install opencv-python')
-get_ipython().system('pip install pytesseract')
-get_ipython().system('pip install PyPDF2')
-
-
-# In[58]:
-
-
 import cv2 
 import pytesseract
 import numpy as np
-
-
-# In[59]:
+import PyPDF2
+import os
+import word_summarizer
 
 
 # get grayscale image
@@ -69,10 +55,6 @@ def deskew(image):
 def match_template(image, template):
     return cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED) 
 
-
-# In[60]:
-
-
 def read_image(file_name):
     img = cv2.imread(file_name)
     
@@ -82,18 +64,6 @@ def read_image(file_name):
     text = pytesseract.image_to_string(img, config=custom_config)
     
     return text 
-
-
-# In[61]:
-
-
-read_image(r'C:\Users\alici\Downloads\Hackathons\Hack&Roll2021\test_image.png')
-
-
-# In[70]:
-
-
-import PyPDF2
 
 def read_pdf(file_name):
     pdfFileObj = open(file_name, 'rb')
@@ -113,15 +83,18 @@ def read_pdf(file_name):
 
     return text
 
-
-# In[71]:
-
-
-print(read_pdf(r'C:\Users\alici\Downloads\Hackathons\Hack&Roll2021\test_text3.pdf'))
-
-
-
-
-
+def process_pdf(filestorage):
+    curr_dir = os.path.dirname(os.path.realpath(__file__))
+    filestorage.save(f"{curr_dir}/data/tmp.pdf")
+    file_dir = f"{curr_dir}/data/tmp.pdf"
+    text = read_pdf(file_dir)
+    tokenizer, model = word_summarizer.load_model_tokenizer_BERT()
+    sentence_list = word_summarizer.split_into_sentences(text)
+    summary_length = len(sentence_list)//4
+    print(sentence_list)
+    if summary_length == 0:
+        return ""
+    summarized_text = word_summarizer.sentence_summarizer(sentence_list, tokenizer, model, int(summary_length))
+    return summarized_text
 
 
