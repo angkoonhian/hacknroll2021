@@ -6,6 +6,7 @@ import random
 import os
 import nltk
 import spacy
+import named_entity_recognition
 
 def load_model_tokenizer_BERT():
     """
@@ -159,16 +160,8 @@ def sentence_summarizer(sentence_list, tokenizer, model, summary_length):
     for i in output_sentence_lst:
         summary += sentence_list[i]
         summary += " "
-    return summary
+    return named_entity_recognition.NER_summary(summary)
 
-def NER_summary(summary):
-    nlp = spacy.load('en_core_web_sm')
-    filter = {'ents':['GPE', 'ORG', 'PERSON']}
-    NER = nlp(summary)
-    summary_lst = summary.split(" ")
-    for i in range(len(summary_lst)):
-        if summary_lst[i] in NER.ents:
-            summary_lst[i] = "<strong>" + summary_lst[i] + "</strong>"
-    return " ".join(summary_lst)
+
 
 

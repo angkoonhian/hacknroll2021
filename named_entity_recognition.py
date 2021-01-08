@@ -30,7 +30,8 @@ def get_highlighted_list(text):
 
 def NER_summary(text):
     summary_lst = text.split(" ")
+    keyword = set(get_highlighted_list(text))
     for i in range(len(summary_lst)):
-        if summary_lst[i] in get_highlighted_list(text):
+        if summary_lst[i] in keyword:
             summary_lst[i] = "<strong>" + summary_lst[i] + "</strong>"
     return " ".join(summary_lst)
