@@ -9,54 +9,28 @@ Original file is located at
 # Using Spacy Package for Named Entity Recognition
 """
 
-!pip install flask Flask-Markdown spacy
-
-from flask import Flask,url_for,render_template,request
-from flaskext.markdown import Markdown
 import numpy as np
 import nltk, re
+from nltk.util import ngrams
 import spacy
 from spacy.lang.en import English
+from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import sent_tokenize
-from spacy import displacy
-import json
-
-app = Flask(__name__)
-Markdown(app)
-HTML_WRAPPER = """<div style="overflow-x: auto; border: 1px solid #e6e9ef; border-radius: 0.25rem; padding: 1rem">{}</div>"""
-
-@app.route('/')
-def index():
-	return render_template('index.html')
 
 
-@app.route('/extract',methods=["GET","POST"])
-def extract():
-  nlp = spacy.load('en_core_web_sm')
-  filter = {'ents':['GPE', 'ORG', 'PERSON']}
-  if request.method == 'POST':
-    raw_text = request.form['rawtext']
-    docx = nlp(raw_text) 
-    html = displacy.render(docx,style="ent", jupyter=True, options = filter)
-    html = html.replace("\n\n","\n")
-    result = HTML_WRAPPER.format(html)
-  return render_template('result.html',rawtext=raw_text,result=result)
+def get_highlighted_list(text):
+    nlp = spacy.load('en_core_web_sm')
+    text = nlp(text)
+    filter_list = ["GPE", "ORG", "PERSON"]
+    bold_list= []
+    for entity in text.ents:
+        if entity.label_ in filter_list:
+            bold_list.append(entity.text)
+    return bold_list
 
-
-@app.route('/previewer')
-def previewer():
-	return render_template('previewer.html')
-
-@app.route('/preview',methods=["GET","POST"])
-def preview():
-	if request.method == 'POST':
-		newtext = request.form['newtext']
-		result = newtext
-	return render_template('preview.html',newtext=newtext,result=result)  
-
-
-if __name__ == '__main__':
-  app.run(debug=True)
-
-
-
+def NER_summary(text):
+    summary_lst = text.split(" ")
+    for i in range(len(summary_lst)):
+        if summary_lst[i] in get_highlighted_list(text):
+            summary_lst[i] = "<strong>" + summary_lst[i] + "</strong>"
+    return " ".join(summary_lst)
