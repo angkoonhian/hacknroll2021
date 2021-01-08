@@ -1,9 +1,30 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[12]:
+
+
+get_ipython().system('pip install opencv-python')
+get_ipython().system('pip install pytesseract')
+get_ipython().system('pip install PyPDF2')
+
+
+# In[86]:
+
+
+get_ipython().system('pip install python-docx ')
+
+
+# In[87]:
+
+
 import cv2 
 import pytesseract
 import numpy as np
-import PyPDF2
-import os
-import word_summarizer
+import docx
+
+
+# In[73]:
 
 
 # get grayscale image
@@ -55,6 +76,11 @@ def deskew(image):
 def match_template(image, template):
     return cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED) 
 
+
+# In[74]:
+
+
+#png,jpg
 def read_image(file_name):
     img = cv2.imread(file_name)
     
@@ -64,6 +90,18 @@ def read_image(file_name):
     text = pytesseract.image_to_string(img, config=custom_config)
     
     return text 
+
+
+# In[76]:
+
+
+read_image(r'C:\Users\alici\Downloads\Hackathons\Hack&Roll2021\test_image.jpg')
+
+
+# In[103]:
+
+
+import PyPDF2
 
 def read_pdf(file_name):
     pdfFileObj = open(file_name, 'rb')
@@ -79,21 +117,56 @@ def read_pdf(file_name):
       
         page = pdfReader.getPage(page_number)
         page_content = page.extractText()
-        text += " ".join(page_content.split()) + " "
+        text += " ".join(page_content.split()) + "\n"
 
     return text
 
-def process_pdf(filestorage):
-    curr_dir = os.path.dirname(os.path.realpath(__file__))
-    filestorage.save(f"{curr_dir}/data/tmp.pdf")
-    file_dir = f"{curr_dir}/data/tmp.pdf"
-    text = read_pdf(file_dir)
-    tokenizer, model = word_summarizer.load_model_tokenizer_BERT()
-    sentence_list = word_summarizer.split_into_sentences(text)
-    summary_length = len(sentence_list)//4
-    if summary_length == 0:
-        return ""
-    summarized_text = word_summarizer.sentence_summarizer(sentence_list, tokenizer, model, int(summary_length))
-    return summarized_text
+
+# In[104]:
+
+
+print(read_pdf(r'C:\Users\alici\Downloads\Hackathons\Hack&Roll2021\test_text3.pdf'))
+
+
+# In[105]:
+
+
+import docx
+def read_worddoc(file_name):
+    doc = docx.Document(file_name)
+    fullText = []
+    for para in doc.paragraphs:
+        fullText.append(para.text)
+    return '\n'.join(fullText)
+
+
+# In[117]:
+
+
+print(read_worddoc(r'C:\Users\alici\Downloads\Hackathons\Hack&Roll2021\test_text.docx'))
+
+
+# In[119]:
+
+
+def read_txt(file_name):
+    
+    txtFileObj = open(file_name, "r")
+    
+    text = ""
+    for line in txtFileObj:
+        text += " ".join(line.split()) + "\n"             
+    return text
+
+
+# In[120]:
+
+
+print(read_txt(r'C:\Users\alici\Downloads\Hackathons\Hack&Roll2021\test_text.txt'))
+
+
+# In[ ]:
+
+
 
 
