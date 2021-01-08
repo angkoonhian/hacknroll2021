@@ -20,7 +20,7 @@ import PyPDF2
 from tika import parser
 from pathlib import Path
 
-nlp = spacy.load('en_core_web_sm')
+sp = spacy.load('en_core_web_sm')
 
 
 text = sp('''
