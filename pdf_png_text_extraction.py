@@ -91,7 +91,6 @@ def process_pdf(filestorage):
     tokenizer, model = word_summarizer.load_model_tokenizer_BERT()
     sentence_list = word_summarizer.split_into_sentences(text)
     summary_length = len(sentence_list)//4
-    print(sentence_list)
     if summary_length == 0:
         return ""
     summarized_text = word_summarizer.sentence_summarizer(sentence_list, tokenizer, model, int(summary_length))
