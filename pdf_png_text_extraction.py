@@ -107,8 +107,6 @@ def process_file(filename):
         else:
             filetype = filename[i] + filetype
 
-    print(filetype)
-    return
     if filetype == "txt":
         text = read_txt(filename)
     elif filetype == "docx":
@@ -118,7 +116,7 @@ def process_file(filename):
     else:
         text = read_image(filename)
 
-    
+
 
     tokenizer, model = word_summarizer.load_model_tokenizer_BERT()
     sentence_list = word_summarizer.split_into_sentences(text)
